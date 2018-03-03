@@ -32,38 +32,43 @@ def transverse_graph(graph):
 		print "node: %d, degree %d" % ( NI.GetId(), NI.GetDeg())
 		for br in NI.GetOutEdges():
 			print br
-
+def makeGraphFromEdgeFile(filename):
 #------------------ CREATING GRAPH from .edges file--------------------------------------
-file=open("facebook/0.edges","r")
-lines=file.readlines()
-G1 = snap.TUNGraph.New()
-for line in lines:
-	line=line.strip("\n")
-	line=map(int,line.split(" "))
-	if not G1.IsNode(line[0]):
-		G1.AddNode(line[0])
-	if not G1.IsNode(line[1]):
-		G1.AddNode(line[1])
-	if not G1.IsEdge(line[0],line[1]):
-		G1.AddEdge(line[0],line[1])
-#transverse_graph(G2)
-#------------------------------------------------------------------------------------------------
-#------------------ FIND 5 GREATEST CENTRALITY BASED ON EIGENVECTOR-----------
-ce=CalculateEigenVectorCentr(G1)
-#Sorting DSC the ce(Centrality Eigenvector)
-ce=OrderedDict(sorted(ce.items(),key=lambda x:x[1],reverse=True))
-print "5 Greatest Centrality Based On EigenVector"
-for i in ce.keys()[:5]:
-	print "node: %d have eigenvector: %f" % (i, ce[i])
+	file=open(filename,"r")
+	lines=file.readlines()
+	graph = snap.TUNGraph.New()
+	for line in lines:
+		line=line.strip("\n")
+		line=map(int,line.split(" "))
+		if not graph.IsNode(line[0]):
+			graph.AddNode(line[0])
+		if not graph.IsNode(line[1]):
+			graph.AddNode(line[1])
+		if not graph.IsEdge(line[0],line[1]):
+			graph.AddEdge(line[0],line[1])
+	#transverse_graph(graph)
+	return graph
 
+users=[0,107,348,414,686]
+graphs=[]
+for user in users: graphs.append(makeGraphFromEdgeFile("facebook/"+str(user)+".edges"))
 
-#------------------------------------------------------------------------------------------------
-#------------------ FIND 5 GREATEST CENTRALITY BASED ON EIGENVECTOR-----------
-cp=CalculatePageRank(G1,1,100)
-#Sorting DSC the ce(Centrality PageRank)
-cp=OrderedDict(sorted(cp.items(),key=lambda x:x[1],reverse=True))
-print "5 Greatest Centrality Based On Page Ranking"
-for i in cp.keys()[:5]:
-	print "node: %d have page rank: %f" % (i, cp[i])
-#-------------------------------------------------------------------------------------------------
-
+for i,graph in enumerate (graphs):
+	print "User: %d"%users[i]
+	#------------------ FIND 5 GREATEST CENTRALITY BASED ON EIGENVECTOR-----------
+	ce=CalculateEigenVectorCentr(graph)
+	#Sorting DSC the ce(Centrality Eigenvector)
+	ce=OrderedDict(sorted(ce.items(),key=lambda x:x[1],reverse=True))
+	print "5 Greatest Centrality Based On EigenVector"
+	for i in ce.keys()[:5]:
+		print "node: %d have eigenvector: %f" % (i, ce[i])
+	#------------------------------------------------------------------------------------------------
+	#------------------ FIND 5 GREATEST CENTRALITY BASED ON EIGENVECTOR-----------
+	cp=CalculatePageRank(graph,1,100)
+	#Sorting DSC the ce(Centrality PageRank)
+	cp=OrderedDict(sorted(cp.items(),key=lambda x:x[1],reverse=True))
+	print "5 Greatest Centrality Based On Page Ranking"
+	for i in cp.keys()[:5]:
+		print "node: %d have page rank: %f" % (i, cp[i])
+	#-------------------------------------------------------------------------------------------------
+	print"--                                          --"
