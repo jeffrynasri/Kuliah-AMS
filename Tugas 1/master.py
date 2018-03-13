@@ -66,12 +66,6 @@ def makeGraphFromEdgeFile(filename):
 	#transverse_graph(graph)
 	return graph
 
-Graph = snap.GenRndGnm(snap.PNGraph, 100, 1000)
-Num = 50
-List = snap.TIntV.GetV(1, 4, 9, 16, 25, 36)
-Dist = snap.GetBfsEffDiam(Graph, Num, List, True,0,0)
-print Dist
-
 users=[0,107,348,414,686]
 graphs=[]
 for user in users: graphs.append(makeGraphFromEdgeFile("facebook/"+str(user)+".edges"))
