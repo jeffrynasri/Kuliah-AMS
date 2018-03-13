@@ -27,6 +27,23 @@ def CalculatePageRank(graph,alpha,number_iteration):
 	for item in PRankH:
 		output[item]=PRankH[item]
 	return output
+def CalculateBetweennessCentrality(graph):
+	nodes = snap.TIntFltH()
+	edges = snap.TIntPrFltH()
+	snap.GetBetweennessCentr(graph, nodes, edges, 1.0)
+	output={}
+	for node in nodes:
+		output[node]=nodes[node]
+	return output
+def CalculateClusteringCoefficient(graph):
+	#output={}
+	NIdCCfH = snap.TIntFltH()
+	snap.GetNodeClustCf(graph, NIdCCfH)
+	print "CLUSTERRING COEFFICIENT"
+	for item in NIdCCfH:
+		print "Node %d th have coefficient %f" % (item, NIdCCfH[item])
+	
+	#return output	
 def transverse_graph(graph):
 	for NI in graph.Nodes():
 		print "node: %d, degree %d" % ( NI.GetId(), NI.GetDeg())
@@ -49,6 +66,12 @@ def makeGraphFromEdgeFile(filename):
 	#transverse_graph(graph)
 	return graph
 
+Graph = snap.GenRndGnm(snap.PNGraph, 100, 1000)
+Num = 50
+List = snap.TIntV.GetV(1, 4, 9, 16, 25, 36)
+Dist = snap.GetBfsEffDiam(Graph, Num, List, True,0,0)
+print Dist
+
 users=[0,107,348,414,686]
 graphs=[]
 for user in users: graphs.append(makeGraphFromEdgeFile("facebook/"+str(user)+".edges"))
@@ -63,12 +86,23 @@ for i,graph in enumerate (graphs):
 	for i in ce.keys()[:5]:
 		print "node: %d have eigenvector: %f" % (i, ce[i])
 	#------------------------------------------------------------------------------------------------
-	#------------------ FIND 5 GREATEST CENTRALITY BASED ON EIGENVECTOR-----------
+	#------------------ FIND 5 GREATEST CENTRALITY BASED ON PAGERANK-----------
 	cp=CalculatePageRank(graph,1,100)
 	#Sorting DSC the ce(Centrality PageRank)
 	cp=OrderedDict(sorted(cp.items(),key=lambda x:x[1],reverse=True))
 	print "5 Greatest Centrality Based On Page Ranking"
 	for i in cp.keys()[:5]:
 		print "node: %d have page rank: %f" % (i, cp[i])
+	#-------------------------------------------------------------------------------------------------
+	#------------------ FIND 5 GREATEST CENTRALITY BASED ON BETWEENESS CENTRALITY----
+	cp=CalculateBetweennessCentrality(graph)
+	#Sorting DSC the cb(Beetweenes Centrality)
+	cp=OrderedDict(sorted(cp.items(),key=lambda x:x[1],reverse=True))
+	print "5 Greatest Centrality Based On Beetweenes Centrality"
+	for i in cp.keys()[:5]:
+		print "node: %d have page rank: %f" % (i, cp[i])
+	#-------------------------------------------------------------------------------------------------
+	#------------------ CALCULATE ALL COEFFICIENT CLUSTERRING IN GRAPh----
+	CalculateClusteringCoefficient(graph)
 	#-------------------------------------------------------------------------------------------------
 	print"--                                          --"
