@@ -104,56 +104,46 @@ def makeGraphFromEdgeFile(filename):
 	#transverse_graph(graph)
 	return graph
 
-# ------------------ VISUALIZE GRAPH-------------------------------------------------------
-VisualizeGraph()
-# -----------------------------------------------------------------------------------------
 
-users=[0,107,348,414,686]
-graphs=[]
-for user in users: graphs.append(makeGraphFromEdgeFile("facebook/"+str(user)+".edges"))
+def RankDegreeGraphDSC(graph):
+	output={}
+	#NIdEigenH = snap.TIntFltH()
+	#snap.GetEigenVectorCentr(graph, NIdEigenH)
+	#for item in NIdEigenH:
+		#print "node: %d have centrality: %f" % (item, NIdEigenH[item])
+		#output[item]=NIdEigenH[item]
+	
+	result_degree = snap.TIntV()
+	snap.GetDegSeqV(graph, result_degree)
+	for i in range(0, result_degree.Len()):
+		output[i]=result_degree[i]
+	
+	#Sorting DSC
+	output=OrderedDict(sorted(output.items(),key=lambda x:x[1],reverse=True))
+	return output
+def Select_m_VertexAsSeed(m):
+	print("")
+def isVertexNear(graph,vertex1,vertex2):
+	print("")
+if __name__=="__main__":
+	'''
+	. Input graph, m = jumlah seed(diambil berapa teratas), sampling rate,x= sample size
+	. buat fungsi RankDegreeGraphDSC
+	. buat fungsi selectMvertexAsSeed
+	. buat fungsi isVertexesNearest
+	'''
+	users=[0]#,107,348,414,686
+	graphs=[]
+	m=2 #JUMLAH SEED YG DIAMBIL. Graph yg telah diurutkan degreenya akan diambil m nodes TERATAS
+	x=25 #UKURAN SUBGRAPH OUTPUT
+	for user in users: graphs.append(makeGraphFromEdgeFile("facebook/"+str(user)+".edges"))
 
-for i,graph in enumerate (graphs):
-	print "User: %d"%users[i]
-	#------------------ FIND 5 GREATEST CENTRALITY BASED ON EIGENVECTOR-----------
-	ce=CalculateEigenVectorCentr(graph)
-	#Sorting DSC the ce(Centrality Eigenvector)
-	ce=OrderedDict(sorted(ce.items(),key=lambda x:x[1],reverse=True))
-	print "5 Greatest Centrality Based On EigenVector"
-	for i in ce.keys()[:5]:
-		print "node: %d have eigenvector: %f" % (i, ce[i])
-	#------------------------------------------------------------------------------------------------
-	#------------------ FIND 5 GREATEST CENTRALITY BASED ON PAGERANK-----------
-	cp=CalculatePageRank(graph,1,100)
-	#Sorting DSC the ce(Centrality PageRank)
-	cp=OrderedDict(sorted(cp.items(),key=lambda x:x[1],reverse=True))
-	print "5 Greatest Centrality Based On Page Ranking"
-	for i in cp.keys()[:5]:
-		print "node: %d have page rank: %f" % (i, cp[i])
-	#-------------------------------------------------------------------------------------------------
-	#------------------ FIND 5 GREATEST CENTRALITY BASED ON BETWEENESS CENTRALITY----
-	cp=CalculateBetweennessCentrality(graph)
-	#Sorting DSC the cb(Beetweenes Centrality)
-	cp=OrderedDict(sorted(cp.items(),key=lambda x:x[1],reverse=True))
-	print "5 Greatest Centrality Based On Beetweenes Centrality"
-	for i in cp.keys()[:5]:
-		print "node: %d have page rank: %f" % (i, cp[i])
-	#-------------------------------------------------------------------------------------------------
-	#------------------ CALCULATE ALL COEFFICIENT CLUSTERRING IN GRAPh----
-	# CalculateClusteringCoefficient(graph)
-	#-------------------------------------------------------------------------------------------------
-	# print"--                                          --"
-	#------------------ FIND 5 GREATEST CENTRALITY BASED ON CLOSENESS CENTRALITY-----------------------
-	cp=CalculateClosenessCentrality(graph)
-	cp=sorted(cp,key=lambda x:x[1],reverse=True)
-	print "5 Greatest Centrality Based On Closeness Centrality"
-	for i in range(5):
-		print "node: %d have closeness: %f" % (cp[i][0], cp[i][1])
-	#--------------------------------------------------------------------------------------------------
-	# ------------------ FIND POWER LAW DISTRIBUTION---------------------------------------------------
-	# CalculatePowerLawDistribution(graph, users[i])
-	# -------------------------------------------------------------------------------------------------
-	# ------------------ FIND AVERAGE PATH LENGTH------------------------------------------------------
-	avg_dist = CalculateAveragePathLength(graph)
-	print "Average Path Length"
-	print avg_dist
-	# -------------------------------------------------------------------------------------------------
+	for i,graph in enumerate (graphs):
+		print "User: %d"%users[i]
+		#------------------ RANGKING GRAPH BERDASARKAN DEGREE SECARA DESCENDING-----------
+		sortedDictionary=RankDegreeGraphDSC(graph)
+		
+		for i in sortedDictionary.keys()[:5]:
+			print "node: %d have eigenvector: %f" % (i, sortedDictionary[i])
+		#------------------------------------------------------------------------------------------------
+	
