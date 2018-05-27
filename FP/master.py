@@ -140,13 +140,16 @@ def Select_m_VertexAsSeed(graph,subgraph,dictionary,m):
 		for subg in subgraph:
 			if(isVertexNear(graph,subg,dictionary.keys()[i])):
 				flag_dekat=1
-				
+		
 		if(flag_dekat==0):
 			subgraph.append(dictionary.keys()[i])
+			print("NODE dengan degree %d akan dimasukkan ke SUBGRAPH" % dictionary.get(dictionary.keys()[0]))
 			m=m-1
 def isVertexNear(graph,vertexStart,vertexEnd): #DIKATAKAN TIDAK DEKAT, JIKA 2 VERTEX TERPISAH 2 EDGE
 	NodeVec = snap.TIntV()
+	
 	snap.GetNodesAtHop(graph, vertexStart, 1, NodeVec, False)
+	
 	neighbours=[]
 	for item in NodeVec:
 		neighbours.append(item)
@@ -162,7 +165,7 @@ if __name__=="__main__":
 	users=[0]#,107,348,414,686
 	graphs=[]
 	m=2 #JUMLAH SEED YG DIAMBIL. Graph yg telah diurutkan degreenya akan diambil m nodes TERATAS
-	samplingRate=0.5 #SAMPLING RATE
+	samplingRate=0.2 #SAMPLING RATE
 	
 	
 	for user in users: graphs.append(makeGraphFromEdgeFile("facebook/"+str(user)+".edges"))
@@ -197,6 +200,7 @@ if __name__=="__main__":
 				newseed.append(sortedAdjacentNodeDictionary.keys()[0])
 				#Select adjacent vertex w with highest degree put to subgraph
 				subgraph.append(sortedAdjacentNodeDictionary.keys()[0])
+				print("NODE dengan degree %d akan dimasukkan ke SUBGRAPH" % sortedAdjacentNodeDictionary.get(sortedAdjacentNodeDictionary.keys()[0]))
 				Si=Si+1
 			seed=newseed
 			
