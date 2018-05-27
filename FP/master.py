@@ -27,7 +27,12 @@ def VisualizeGraph(graph):
 	nx.draw_networkx(graph, pos=sp, with_labels=True, node_size=35)
 	plt.show()
 
-#return output
+def countAllNode(graph):
+	count=0
+	for NI in graph.Nodes():
+		count=count+1
+	return count
+
 def transverse_graph(graph):
 	for NI in graph.Nodes():
 		print "node: %d, degree %d" % ( NI.GetId(), NI.GetDeg())
@@ -66,6 +71,7 @@ def RankDegreeAdjacentNodeDSC(graph,nodeCenter):
 	return output
 def GenerateRandomGraph():
 	g = snap.TUNGraph.New()
+	'''
 	g.AddNode(1)
 	g.AddNode(2)
 	g.AddNode(3)
@@ -77,7 +83,34 @@ def GenerateRandomGraph():
 	g.AddEdge(4,5)
 	g.AddEdge(3,5)
 	g.AddEdge(1,5)
-	
+	'''
+	#GRAPH DI GOOGLE SLIDE
+	g.AddNode(1)#OSCAR
+	g.AddNode(2)#DAVE
+	g.AddNode(3)#ALICE
+	g.AddNode(4)#CARLOS
+	g.AddNode(5)#LMOTHEP
+	g.AddNode(6)#CAROL
+	g.AddNode(7)#EVE
+	g.AddNode(8)#CHUCK
+	g.AddNode(9)#BOB
+	g.AddNode(10)#ISHAC
+
+	g.AddEdge(1,2)
+	g.AddEdge(1,3)
+	g.AddEdge(2,3)
+	g.AddEdge(3,4)
+	g.AddEdge(4,5)
+	g.AddEdge(5,6)
+	g.AddEdge(5,7)
+	g.AddEdge(5,8)
+	g.AddEdge(6,7)
+	g.AddEdge(7,8)
+	g.AddEdge(7,9)
+	g.AddEdge(7,10)
+	g.AddEdge(8,9)
+	g.AddEdge(8,10)
+	g.AddEdge(9,10)
 	return g
 
 def RankDegreeGraphDSC(graph):
@@ -125,21 +158,27 @@ def isVertexNear(graph,vertexStart,vertexEnd): #DIKATAKAN TIDAK DEKAT, JIKA 2 VE
 		return False
 		#print("AMAN BOS")
 if __name__=="__main__":
-	'''
-	. Input graph, m = jumlah seed(diambil berapa teratas), sampling rate,x= sample size
-	. buat fungsi RankDegreeGraphDSC
-	. buat fungsi selectMvertexAsSeed
-	. buat fungsi isVertexesNearest
-	'''
+	
 	users=[0]#,107,348,414,686
 	graphs=[]
 	m=2 #JUMLAH SEED YG DIAMBIL. Graph yg telah diurutkan degreenya akan diambil m nodes TERATAS
-	x=10 #UKURAN SUBGRAPH OUTPUT
+	samplingRate=0.5 #SAMPLING RATE
+	
+	
 	for user in users: graphs.append(makeGraphFromEdgeFile("facebook/"+str(user)+".edges"))
 	
 	for i,graph in enumerate (graphs):
+		''' 
+		#HAPUS KOMEN INI, UNTUK MENGGUNAKAN GRAP yg DI GGOGLE SLIDE
+		graph=GenerateRandomGraph() 
+		VisualizeGraph(graph)
+		'''
+		
 		subgraph=[]
 		seed=[]
+		x=samplingRate*snap.CntNonZNodes(graph)/10 #UKURAN SUBGRAPH OUTPUT
+		
+
 		print "User: %d"%users[i]
 		#------------------ RANGKING GRAPH BERDASARKAN DEGREE SECARA DESCENDING-----------
 		sortedGraphDictionary=RankDegreeGraphDSC(graph)
@@ -147,8 +186,7 @@ if __name__=="__main__":
 		#------------------ INISIALISASI SUBGRAPH DG MEMILIH m NODE TERATAS -----------
 		subgraph=Select_m_VertexAsSeed(graph,subgraph,sortedGraphDictionary,m)
 		seed=Select_m_VertexAsSeed(graph,seed,sortedGraphDictionary,m)
-		print(subgraph)
-	
+		
 		Si=m
 		while (Si<x):
 			newseed=[]
@@ -163,13 +201,5 @@ if __name__=="__main__":
 			seed=newseed
 			
 		print(subgraph)
-	'''			
-	g= GenerateRandomGraph()
-	subgraph=[]
-	sortedGraphasDictionary=RankDegreeGraphDSC(g)
-	subgraph=Select_m_VertexAsSeed(g,subgraph,sortedGraphasDictionary,m)
-	print(subgraph)
 	
-	'''
-	#VisualizeGraph(g)
 	
