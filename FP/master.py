@@ -11,73 +11,20 @@ from scipy import linalg as la
 from collections import OrderedDict
 import matplotlib.pyplot as plt
 import networkx as nx
+import os
 
-def CalculateEigenVectorCentr(graph):
-	output={}
-	NIdEigenH = snap.TIntFltH()
-	snap.GetEigenVectorCentr(graph, NIdEigenH)
-	
-	for item in NIdEigenH:
-		#print "node: %d have centrality: %f" % (item, NIdEigenH[item])
-		output[item]=NIdEigenH[item]
-	return output
-		
-def CalculatePageRank(graph,alpha,number_iteration):
-	PRankH=snap.TIntFltH()
-	snap.GetPageRank(graph,PRankH,alpha, 1e-4, number_iteration)
-	output={}
-	for item in PRankH:
-		output[item]=PRankH[item]
-	return output
-
-def CalculateBetweennessCentrality(graph):
-	nodes = snap.TIntFltH()
-	edges = snap.TIntPrFltH()
-	snap.GetBetweennessCentr(graph, nodes, edges, 1.0)
-	output={}
-	for node in nodes:
-		output[node]=nodes[node]
-	return output
-
-def CalculateClusteringCoefficient(graph):
-	#output={}
-	NIdCCfH = snap.TIntFltH()
-	snap.GetNodeClustCf(graph, NIdCCfH)
-	print "CLUSTERRING COEFFICIENT"
-	for item in NIdCCfH:
-		print "Node %d th have coefficient %f" % (item, NIdCCfH[item])
-
-def CalculateClosenessCentrality(graph):
-	output = []
+def VisualizeGraph(graph):
+	file = open("temp.txt", mode='w')
 	for NI in graph.Nodes():
-		CloseCentr = snap.GetClosenessCentr(graph, NI.GetId())
-		output.append([NI.GetId(), CloseCentr]);
-		# print "node: %d centrality: %f" % (NI.GetId(), CloseCentr)
-	return output
-
-def CalculatePowerLawDistribution(graph, user):
-	DegToCntV = snap.TIntPrV()
-	snap.GetDegCnt(graph, DegToCntV)
-	x = []
-	y = []
-	for item in DegToCntV:
-		x.append(item.GetVal2())
-		y.append(item.GetVal1())
-		# print "%d nodes with degree %d" % (item.GetVal2(), item.GetVal1())
-	plt.plot(x, y, 'ro')
-	plt.show()
-
-def CalculateAveragePathLength(graph):
-	Num = 100
-	Dist = snap.GetBfsEffDiam(graph, Num)
-	return Dist
-
-def VisualizeGraph():
-	graph = nx.read_edgelist("facebook/facebook_combined.txt", create_using=nx.Graph(), nodetype=int)
-	print nx.info(graph)
+			for br in NI.GetOutEdges():
+				file.write(str(NI.GetId()) + " " + str(br) + "\n")
+	file.close()
+	graph = nx.read_edgelist("temp.txt", create_using=nx.Graph(), nodetype=int)
+	os.remove("temp.txt")
+	#print nx.info(graph)
 	sp = nx.spring_layout(graph)
 	plt.axis('off')
-	nx.draw_networkx(graph, pos=sp, with_labels=False, node_size=35)
+	nx.draw_networkx(graph, pos=sp, with_labels=True, node_size=35)
 	plt.show()
 
 #return output
@@ -104,6 +51,34 @@ def makeGraphFromEdgeFile(filename):
 	#transverse_graph(graph)
 	return graph
 
+def RankDegreeAdjacentNodeDSC(graph,nodeCenter):
+	output={}
+	NodeVec = snap.TIntV()
+	sortedGraphDictionary=RankDegreeGraphDSC(graph) #DICITIONARY GRAPH UTAMA
+	
+	snap.GetNodesAtHop(graph, nodeCenter, 1, NodeVec, False)
+	for item in NodeVec:
+		output[item]=sortedGraphDictionary.get(item)
+
+	#Sorting DSC
+	output=OrderedDict(sorted(output.items(),key=lambda x:x[1],reverse=True))
+	#print(output)
+	return output
+def GenerateRandomGraph():
+	g = snap.TUNGraph.New()
+	g.AddNode(1)
+	g.AddNode(2)
+	g.AddNode(3)
+	g.AddNode(4)
+	g.AddNode(5)
+	g.AddEdge(1,2)
+	g.AddEdge(2,3)
+	g.AddEdge(3,4)
+	g.AddEdge(4,5)
+	g.AddEdge(3,5)
+	g.AddEdge(1,5)
+	
+	return g
 
 def RankDegreeGraphDSC(graph):
 	output={}
@@ -116,15 +91,39 @@ def RankDegreeGraphDSC(graph):
 	result_degree = snap.TIntV()
 	snap.GetDegSeqV(graph, result_degree)
 	for i in range(0, result_degree.Len()):
-		output[i]=result_degree[i]
+		output[i+1]=result_degree[i]
 	
 	#Sorting DSC
 	output=OrderedDict(sorted(output.items(),key=lambda x:x[1],reverse=True))
 	return output
-def Select_m_VertexAsSeed(m):
-	print("")
-def isVertexNear(graph,vertex1,vertex2):
-	print("")
+def Select_m_VertexAsSeed(graph,subgraph,dictionary,m):
+	#print(dictionary.keys()[0])
+	for i in range(0,len(dictionary)):
+		if(m<=0):
+			return subgraph
+		
+		flag_dekat=0
+		#Cek apakah data yang akan dimasukkan ke subgraph DEKAT DENGAN data yang sudah ada di subgraph
+		for subg in subgraph:
+			if(isVertexNear(graph,subg,dictionary.keys()[i])):
+				flag_dekat=1
+				
+		if(flag_dekat==0):
+			subgraph.append(dictionary.keys()[i])
+			m=m-1
+def isVertexNear(graph,vertexStart,vertexEnd): #DIKATAKAN TIDAK DEKAT, JIKA 2 VERTEX TERPISAH 2 EDGE
+	NodeVec = snap.TIntV()
+	snap.GetNodesAtHop(graph, vertexStart, 1, NodeVec, False)
+	neighbours=[]
+	for item in NodeVec:
+		neighbours.append(item)
+	
+	if vertexEnd in neighbours:
+		#print("TETANGGAN")
+		return True
+	else :
+		return False
+		#print("AMAN BOS")
 if __name__=="__main__":
 	'''
 	. Input graph, m = jumlah seed(diambil berapa teratas), sampling rate,x= sample size
@@ -135,15 +134,42 @@ if __name__=="__main__":
 	users=[0]#,107,348,414,686
 	graphs=[]
 	m=2 #JUMLAH SEED YG DIAMBIL. Graph yg telah diurutkan degreenya akan diambil m nodes TERATAS
-	x=25 #UKURAN SUBGRAPH OUTPUT
+	x=10 #UKURAN SUBGRAPH OUTPUT
 	for user in users: graphs.append(makeGraphFromEdgeFile("facebook/"+str(user)+".edges"))
-
+	
 	for i,graph in enumerate (graphs):
+		subgraph=[]
+		seed=[]
 		print "User: %d"%users[i]
 		#------------------ RANGKING GRAPH BERDASARKAN DEGREE SECARA DESCENDING-----------
-		sortedDictionary=RankDegreeGraphDSC(graph)
+		sortedGraphDictionary=RankDegreeGraphDSC(graph)
 		
-		for i in sortedDictionary.keys()[:5]:
-			print "node: %d have eigenvector: %f" % (i, sortedDictionary[i])
-		#------------------------------------------------------------------------------------------------
+		#------------------ INISIALISASI SUBGRAPH DG MEMILIH m NODE TERATAS -----------
+		subgraph=Select_m_VertexAsSeed(graph,subgraph,sortedGraphDictionary,m)
+		seed=Select_m_VertexAsSeed(graph,seed,sortedGraphDictionary,m)
+		print(subgraph)
+	
+		Si=m
+		while (Si<x):
+			newseed=[]
+			for itemSeed in seed:
+				#Rank adjacent vertices of si based on degree values
+				sortedAdjacentNodeDictionary=RankDegreeAdjacentNodeDSC(graph,itemSeed)
+				#Select adjacent vertex w with highest degree put to seed
+				newseed.append(sortedAdjacentNodeDictionary.keys()[0])
+				#Select adjacent vertex w with highest degree put to subgraph
+				subgraph.append(sortedAdjacentNodeDictionary.keys()[0])
+				Si=Si+1
+			seed=newseed
+			
+		print(subgraph)
+	'''			
+	g= GenerateRandomGraph()
+	subgraph=[]
+	sortedGraphasDictionary=RankDegreeGraphDSC(g)
+	subgraph=Select_m_VertexAsSeed(g,subgraph,sortedGraphasDictionary,m)
+	print(subgraph)
+	
+	'''
+	#VisualizeGraph(g)
 	
