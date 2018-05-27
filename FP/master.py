@@ -143,7 +143,7 @@ def Select_m_VertexAsSeed(graph,subgraph,dictionary,m):
 		
 		if(flag_dekat==0):
 			subgraph.append(dictionary.keys()[i])
-			print("NODE dengan degree %d akan dimasukkan ke SUBGRAPH" % dictionary.get(dictionary.keys()[0]))
+			print("NODE %d dengan degree %d akan dimasukkan ke SUBGRAPH" % (dictionary.keys()[i],dictionary.get(dictionary.keys()[i])))
 			m=m-1
 def isVertexNear(graph,vertexStart,vertexEnd): #DIKATAKAN TIDAK DEKAT, JIKA 2 VERTEX TERPISAH 2 EDGE
 	NodeVec = snap.TIntV()
@@ -188,7 +188,7 @@ if __name__=="__main__":
 		
 		#------------------ INISIALISASI SUBGRAPH DG MEMILIH m NODE TERATAS -----------
 		subgraph=Select_m_VertexAsSeed(graph,subgraph,sortedGraphDictionary,m)
-		seed=Select_m_VertexAsSeed(graph,seed,sortedGraphDictionary,m)
+		seed=list(subgraph)
 		
 		Si=m
 		while (Si<x):
@@ -196,14 +196,17 @@ if __name__=="__main__":
 			for itemSeed in seed:
 				#Rank adjacent vertices of si based on degree values
 				sortedAdjacentNodeDictionary=RankDegreeAdjacentNodeDSC(graph,itemSeed)
-				#Select adjacent vertex w with highest degree put to seed
-				newseed.append(sortedAdjacentNodeDictionary.keys()[0])
-				#Select adjacent vertex w with highest degree put to subgraph
-				subgraph.append(sortedAdjacentNodeDictionary.keys()[0])
-				print("NODE dengan degree %d akan dimasukkan ke SUBGRAPH" % sortedAdjacentNodeDictionary.get(sortedAdjacentNodeDictionary.keys()[0]))
-				Si=Si+1
-			seed=newseed
+				#Select adjacent vertex w with highest degree put to seed and Subgraph
+				for i in range(0,len(sortedAdjacentNodeDictionary)):
+					if (sortedAdjacentNodeDictionary.keys()[i] not in subgraph):
+						newseed.append(sortedAdjacentNodeDictionary.keys()[i])
+						subgraph.append(sortedAdjacentNodeDictionary.keys()[i])
+						print("NODE %d dengan degree %d akan dimasukkan ke SUBGRAPH" % (sortedAdjacentNodeDictionary.keys()[i],sortedAdjacentNodeDictionary.get(sortedAdjacentNodeDictionary.keys()[i])))
+						Si=Si+1
+						break
+			seed=list(newseed)
 			
 		print(subgraph)
-	
+		
+		
 	

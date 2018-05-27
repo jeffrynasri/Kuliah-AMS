@@ -1,3 +1,1 @@
 . Penggunaan fungsi snap.GetNodesAtHop(graph, vertexStart, m, NodeVec, False) di beberapa kondisi bermasalah. Fungsi Get NodesAt Hop adalah fungsi mencari daftar node yang bersebelahan dengan vertexStart dengan jarak m edge
-
-. Forever Loop saat perhitungan subgraph
