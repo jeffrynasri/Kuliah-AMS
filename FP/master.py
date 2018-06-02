@@ -147,7 +147,7 @@ def Select_m_VertexAsSeed(graph,subgraph,dictionary,m):
 		
 		if(flag_dekat==0):
 			subgraph.append(dictionary.keys()[i])
-			print("NODE %d dengan degree %d akan dimasukkan ke SUBGRAPH" % (dictionary.keys()[i],dictionary.get(dictionary.keys()[i])))
+			#print("NODE %d dengan degree %d akan dimasukkan ke SUBGRAPH" % (dictionary.keys()[i],dictionary.get(dictionary.keys()[i])))
 			m=m-1
 def isVertexNear(graph,vertexStart,vertexEnd): #DIKATAKAN TIDAK DEKAT, JIKA 2 VERTEX TERPISAH 2 EDGE
 	NodeVec = snap.TIntV()
@@ -204,11 +204,11 @@ def getAccuracy(subgraph, degCent, betCent):
 	return float(deg_acc)/len(subgraph), float(bet_acc)/len(subgraph)
 
 if __name__=="__main__":
-	
+	samplingRates=[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
 	users=[0,107]#,107,348,414,686
 	graphs=[]
 	m=2 #JUMLAH SEED YG DIAMBIL. Graph yg telah diurutkan degreenya akan diambil m nodes TERATAS
-	samplingRate=0.2 #SAMPLING RATE
+	samplingRate=0.1 #SAMPLING RATE
 	
 	for user in users: graphs.append(makeGraphFromEdgeFile("facebook/"+str(user)+".edges"))
 	
@@ -236,41 +236,44 @@ if __name__=="__main__":
 		
 		print(RankDegreeGraphDSC(graph))
 		'''
-		
-		subgraph=[]
-		seed=[]
-		x=samplingRate*snap.CntNonZNodes(graph)/10 #UKURAN SUBGRAPH OUTPUT
-		
-
 		print "Graph User: %d"%users[i]
-		#------------------ RANGKING GRAPH BERDASARKAN DEGREE SECARA DESCENDING-----------
-		sortedGraphDictionary=RankDegreeGraphDSC(graph)
-		
-		#------------------ INISIALISASI SUBGRAPH DG MEMILIH m NODE TERATAS -----------
-		subgraph=Select_m_VertexAsSeed(graph,subgraph,sortedGraphDictionary,m)
-		seed=list(subgraph)
-		
-		Si=m
-		while (Si<x):
-			newseed=[]
-			for itemSeed in seed:
-				#Rank adjacent vertices of si based on degree values
-				sortedAdjacentNodeDictionary=RankDegreeAdjacentNodeDSC(graph,itemSeed)
-				#Select adjacent vertex w with highest degree put to seed and Subgraph
-				for i in range(0,len(sortedAdjacentNodeDictionary)):
-					if (sortedAdjacentNodeDictionary.keys()[i] not in subgraph):
-						newseed.append(sortedAdjacentNodeDictionary.keys()[i])
-						subgraph.append(sortedAdjacentNodeDictionary.keys()[i])
-						print("NODE %d dengan degree %d akan dimasukkan ke SUBGRAPH" % (sortedAdjacentNodeDictionary.keys()[i],sortedAdjacentNodeDictionary.get(sortedAdjacentNodeDictionary.keys()[i])))
-						Si=Si+1
-						break
-				
-			seed=list(newseed)
+		for itemRate in samplingRates  :
+			print itemRate
+			samplingRate=itemRate
+			subgraph=[]
+			seed=[]
+			x=samplingRate*snap.CntNonZNodes(graph)/10 #UKURAN SUBGRAPH OUTPUT
 			
-		print("OUTPUT Subgraph = " + str( subgraph))
-		print("---------------------------------------")
 
-		degCent = degreeCentrality(graph, x)
-		betCent = betweenessCentrality(graph, x)
-		print getAccuracy(subgraph, degCent, betCent)
+			#------------------ RANGKING GRAPH BERDASARKAN DEGREE SECARA DESCENDING-----------
+			sortedGraphDictionary=RankDegreeGraphDSC(graph)
+			
+			#------------------ INISIALISASI SUBGRAPH DG MEMILIH m NODE TERATAS -----------
+			subgraph=Select_m_VertexAsSeed(graph,subgraph,sortedGraphDictionary,m)
+			seed=list(subgraph)
+			
+			Si=m
+			while (Si<x):
+				newseed=[]
+				for itemSeed in seed:
+					#Rank adjacent vertices of si based on degree values
+					sortedAdjacentNodeDictionary=RankDegreeAdjacentNodeDSC(graph,itemSeed)
+					#Select adjacent vertex w with highest degree put to seed and Subgraph
+					for i in range(0,len(sortedAdjacentNodeDictionary)):
+						if (sortedAdjacentNodeDictionary.keys()[i] not in subgraph):
+							newseed.append(sortedAdjacentNodeDictionary.keys()[i])
+							subgraph.append(sortedAdjacentNodeDictionary.keys()[i])
+							#print("NODE %d dengan degree %d akan dimasukkan ke SUBGRAPH" % (sortedAdjacentNodeDictionary.keys()[i],sortedAdjacentNodeDictionary.get(sortedAdjacentNodeDictionary.keys()[i])))
+							Si=Si+1
+							break
+					
+				seed=list(newseed)
+				
+			print("OUTPUT Subgraph = " + str( subgraph))
+
+			degCent = degreeCentrality(graph, x)
+			betCent = betweenessCentrality(graph, x)
+			print getAccuracy(subgraph, degCent, betCent)
+			
+			print("---------------------------------------")
 	
