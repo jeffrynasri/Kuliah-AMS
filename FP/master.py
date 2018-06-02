@@ -164,6 +164,45 @@ def isVertexNear(graph,vertexStart,vertexEnd): #DIKATAKAN TIDAK DEKAT, JIKA 2 VE
 	else :
 		return False
 		#print("AMAN BOS")
+
+def degreeCentrality(graph, x):
+	degCent = []
+	for NI in graph.Nodes():
+		DegCentr = snap.GetDegreeCentr(graph, NI.GetId())
+		# print "node: %d centrality: %f" % (NI.GetId(), DegCentr)
+		degCent.append([NI.GetId(), DegCentr])
+	degCent = sorted(degCent, key=lambda x: x[1], reverse=True)
+	degCent = degCent[:int(x)]
+	return degCent
+
+def betweenessCentrality(graph, x):
+	betCent = []
+	Nodes = snap.TIntFltH()
+	Edges = snap.TIntPrFltH()
+	snap.GetBetweennessCentr(graph, Nodes, Edges, 1.0)
+	for node in Nodes:
+		# print "node: %d centrality: %f" % (node, Nodes[node])
+		betCent.append([node, Nodes[node]])
+	betCent = sorted(betCent, key=lambda x: x[1], reverse=True)
+	betCent = betCent[:int(x)]
+	# print(betCent)
+	return betCent
+
+def getAccuracy(subgraph, degCent, betCent):
+	#degree centrality acc
+	deg_acc = 0
+	bet_acc = 0
+	for node in subgraph:
+		for node_deg in degCent:
+			if(node == node_deg[0]):
+				deg_acc+=1
+				break
+		for node_bet in betCent:
+			if(node == node_bet[0]):
+				bet_acc+=1
+				break
+	return float(deg_acc)/len(subgraph), float(bet_acc)/len(subgraph)
+
 if __name__=="__main__":
 	
 	users=[0,107]#,107,348,414,686
@@ -230,6 +269,8 @@ if __name__=="__main__":
 			
 		print("OUTPUT Subgraph = " + str( subgraph))
 		print("---------------------------------------")
-		
-		
+
+		degCent = degreeCentrality(graph, x)
+		betCent = betweenessCentrality(graph, x)
+		print getAccuracy(subgraph, degCent, betCent)
 	
