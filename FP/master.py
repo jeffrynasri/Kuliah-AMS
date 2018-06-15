@@ -205,7 +205,7 @@ def getAccuracy(subgraph, degCent, betCent):
 
 if __name__=="__main__":
 	samplingRates=[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
-	users=[0,107]#,107,348,414,686
+	users=[0,107,348,414,686,698,1684,1912,3437,3980]#,0,107,348,414,686,698,1684,1912,3437,3980
 	graphs=[]
 	m=2 #JUMLAH SEED YG DIAMBIL. Graph yg telah diurutkan degreenya akan diambil m nodes TERATAS
 	samplingRate=0.1 #SAMPLING RATE
@@ -237,6 +237,8 @@ if __name__=="__main__":
 		print(RankDegreeGraphDSC(graph))
 		'''
 		print "Graph User: %d"%users[i]
+		print "Graph noder: %d"%countAllNode(graph)
+		
 		for itemRate in samplingRates  :
 			print itemRate
 			samplingRate=itemRate
